@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration production --base-href=/product-carousel/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:product-carousel": "node dist/product-carousel/server/server.mjs",
