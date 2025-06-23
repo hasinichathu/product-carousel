@@ -1,0 +1,161 @@
+<div class="carousel-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading$ | async" class="loading-container">
+    <div class="skeleton-grid">
+      <div *ngFor="let item of skeletonArray" class="skeleton-card">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line skeleton-line-short"></div>
+          <div class="skeleton-line skeleton-line-price"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carousel Content -->
+  <div
+    *ngIf="!(isLoading$ | async) && !(error$ | async)"
+    class="carousel-wrapper"
+    #carouselWrapper
+  >
+    <div class="product-grid">
+      <div
+        *ngFor="let product of products$ | async; trackBy: trackByProductId"
+        class="product-card"
+        [attr.aria-label]="'Product: ' + product.title"
+      >
+        <div class="product-image-container">
+          <img
+            [src]="product.thumbnail"
+            [alt]="product.title"
+            class="product-image"
+            loading="lazy"
+            (error)="onImageError($event)"
+          />
+
+          <!-- Discount Badge -->
+          <div *ngIf="product.discountPercentage > 0" class="discount-badge">
+            -{{ product.discountPercentage | number : "1.0-0" }}%
+          </div>
+
+          <!-- Quick View Button -->
+          <button class="quick-view-btn" (click)="quickView(product)">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+        </div>
+
+        <div class="product-info">
+          <h3 class="product-title">{{ product.title }}</h3>
+          <div class="product-rating">
+            <div class="stars">
+              <span
+                *ngFor="let star of getStars(product.rating); let i = index"
+                class="star"
+                [class.filled]="star"
+                [attr.aria-label]="'Star ' + (i + 1)"
+              >
+                ★
+              </span>
+            </div>
+            <span class="rating-text">({{ product.rating }})</span>
+          </div>
+
+          <div class="product-pricing">
+            <div class="price-container">
+              <span class="current-price"
+                >${{ product.price | number : "1.2-2" }}</span
+              >
+              <span
+                *ngIf="product.discountPercentage > 0"
+                class="original-price"
+              >
+                ${{
+                  getOriginalPrice(product.price, product.discountPercentage)
+                    | number : "1.2-2"
+                }}
+              </span>
+            </div>
+            <div class="stock-info" [class.low-stock]="product.stock < 10">
+              {{ product.stock }} in stock
+            </div>
+          </div>
+
+          <div class="product-actions">
+            <button
+              class="add-to-cart-btn"
+              (click)="addToCart(product)"
+              [disabled]="product.stock === 0"
+              [attr.aria-label]="'Add ' + product.title + ' to cart'"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path
+                  d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+                ></path>
+              </svg>
+              {{ product.stock === 0 ? "Out of Stock" : "Add to Cart" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick-View Modal -->
+<div class="modal-backdrop" *ngIf="selectedProduct">
+  <div class="modal">
+    <button class="close-btn" (click)="closeQuickView()">✕</button>
+    <h2>{{ selectedProduct.title }}</h2>
+    <div class="product-brand">{{ selectedProduct.brand }}</div>
+
+    <img [src]="selectedProduct.thumbnail" [alt]="selectedProduct.title" />
+    <p>
+      <strong>Price:</strong> ${{ selectedProduct.price | number : "1.2-2" }}
+    </p>
+    <p>{{ selectedProduct.description }}</p>
+    <div class="product-actions">
+      <button
+        class="add-to-cart-btn"
+        (click)="addToCart(selectedProduct)"
+        [disabled]="selectedProduct.stock === 0"
+        [attr.aria-label]="'Add ' + selectedProduct.title + ' to cart'"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path
+            d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+          ></path>
+        </svg>
+        {{ selectedProduct.stock === 0 ? "Out of Stock" : "Add to Cart" }}
+      </button>
+    </div>
+  </div>
+</div>

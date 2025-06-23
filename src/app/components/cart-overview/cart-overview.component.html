@@ -1,0 +1,33 @@
+<div class="cart-overview">
+  <h2>Your Cart</h2>
+
+  <ng-container *ngIf="(items$ | async)?.length; else empty">
+    <div *ngFor="let item of items$ | async" class="cart-item">
+      <img class="item-img" [src]="item.thumbnail" [alt]="item.title" />
+      <div class="item-info">
+        <h4>{{ item.title }}</h4>
+        <p class="price">${{ item.price | number : "1.2-2" }}</p>
+      </div>
+      <button class="remove-btn" (click)="remove(item.id)">Remove</button>
+    </div>
+
+    <div class="summary">
+      <div>
+        <p>
+          Total Items: <strong>{{ count$ | async }}</strong>
+        </p>
+        <p>
+          Total Price: <strong>${{ total$ | async | number : "1.2-2" }}</strong>
+        </p>
+      </div>
+      <button class="clear-btn" (click)="clear()">Clear Cart</button>
+    </div>
+  </ng-container>
+
+  <ng-template #empty>
+    <div class="empty">
+      <img src="empty-cart.webp" alt="Empty Cart" />
+      <p>Your cart is empty.</p>
+    </div>
+  </ng-template>
+</div>
