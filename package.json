@@ -7,7 +7,9 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:product-carousel": "node dist/product-carousel/server/server.mjs"
+    "serve:ssr:product-carousel": "node dist/product-carousel/server/server.mjs",
+    "predeploy": "ng run ProductCarousel:build:production --base-href=/product-carousel/",  
+    "deploy": "npx angular-cli-ghpages --dir=dist/product-carousel"
   },
   "private": true,
   "dependencies": {
